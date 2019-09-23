@@ -23,78 +23,78 @@ import org.talend.daikon.content.ContextualPatternResolver;
 
 public class LocalResourceResolverTest {
 
-  private LocalResourceResolver resolver;
+    private LocalResourceResolver resolver;
 
-  private Path resolverRepositoryPath;
+    private Path resolverRepositoryPath;
 
-  @Before
-  public void createCache() throws IOException {
-    final FileSystemResourceLoader resourceLoader;
-    resourceLoader = new FileSystemResourceLoader();
-    final PathMatchingResourcePatternResolver delegate = new PathMatchingResourcePatternResolver(resourceLoader);
+    @Before
+    public void createCache() throws IOException {
+        final FileSystemResourceLoader resourceLoader;
+        resourceLoader = new FileSystemResourceLoader();
+        final PathMatchingResourcePatternResolver delegate = new PathMatchingResourcePatternResolver(resourceLoader);
 
-    resolverRepositoryPath = Files.createTempDirectory(LocalResourceResolverTest.class.getSimpleName());
+        resolverRepositoryPath = Files.createTempDirectory(LocalResourceResolverTest.class.getSimpleName());
 
-    final String relativeTempDirPath =
-        SystemUtils.getUserDir().toPath().relativize(resolverRepositoryPath).toFile().getPath();
+        final String relativeTempDirPath = SystemUtils.getUserDir().toPath().relativize(resolverRepositoryPath).toFile()
+                .getPath();
 
-    resolver = new LocalResourceResolver(new ContextualPatternResolver(delegate, relativeTempDirPath));
-  }
-
-  @After
-  public void cleanupRepository() {
-    FileUtils.deleteQuietly(resolverRepositoryPath.toFile());
-  }
-
-  @Test
-  public void readWrite() throws IOException {
-    String data = "toto data";
-    String location = "toto location";
-
-    // write
-    try (OutputStream outputStream = resolver.getResource(location).getOutputStream();) {
-      IOUtils.write(data, outputStream, UTF_8);
+        resolver = new LocalResourceResolver(new ContextualPatternResolver(delegate, relativeTempDirPath), relativeTempDirPath);
     }
 
-    // read
-    String contentRead;
-    try (InputStream inputStream = resolver.getResource(location).getInputStream()) {
-      contentRead = String.join("", IOUtils.readLines(inputStream, UTF_8));
+    @After
+    public void cleanupRepository() {
+        FileUtils.deleteQuietly(resolverRepositoryPath.toFile());
     }
 
-    // verify
-    assertEquals(data, contentRead);
-  }
+    @Test
+    public void readWrite() throws IOException {
+        String data = "toto data";
+        String location = "toto location";
 
-  @Test
-  public void readWrite_noClose() throws IOException {
-    String data = "toto data";
-    String location = "toto location";
+        // write
+        try (OutputStream outputStream = resolver.getResource(location).getOutputStream();) {
+            IOUtils.write(data, outputStream, UTF_8);
+        }
 
-    // write
-    OutputStream outputStream = resolver.getResource(location).getOutputStream();
-    IOUtils.write(data, outputStream, UTF_8);
+        // read
+        String contentRead;
+        try (InputStream inputStream = resolver.getResource(location).getInputStream()) {
+            contentRead = String.join("", IOUtils.readLines(inputStream, UTF_8));
+        }
 
-    // read
-    InputStream inputStream = resolver.getResource(location).getInputStream();
-    String contentRead = String.join("", IOUtils.readLines(inputStream, UTF_8));
+        // verify
+        assertEquals(data, contentRead);
+    }
 
-    // verify
-    assertEquals(data, contentRead);
-  }
+    @Test
+    public void readWrite_noClose() throws IOException {
+        String data = "toto data";
+        String location = "toto location";
 
-  @Test
-  @Ignore("There is a bug which makes implementation find two resources when there is one but containing a '/'")
-  public void findResources() throws IOException {
-    String data = "toto data";
-    String location = "toto/location";
+        // write
+        OutputStream outputStream = resolver.getResource(location).getOutputStream();
+        IOUtils.write(data, outputStream, UTF_8);
 
-    // write
-    OutputStream outputStream = resolver.getResource(location).getOutputStream();
-    IOUtils.write(data, outputStream, UTF_8);
+        // read
+        InputStream inputStream = resolver.getResource(location).getInputStream();
+        String contentRead = String.join("", IOUtils.readLines(inputStream, UTF_8));
 
-    // read
-    assertEquals(1, Stream.of(resolver.getResources("**")).filter(Resource::isFile).count());
-  }
+        // verify
+        assertEquals(data, contentRead);
+    }
+
+    @Test
+    @Ignore("There is a bug which makes implementation find two resources when there is one but containing a '/'")
+    public void findResources() throws IOException {
+        String data = "toto data";
+        String location = "toto/location";
+
+        // write
+        OutputStream outputStream = resolver.getResource(location).getOutputStream();
+        IOUtils.write(data, outputStream, UTF_8);
+
+        // read
+        assertEquals(1, Stream.of(resolver.getResources("**")).filter(Resource::isFile).count());
+    }
 
 }

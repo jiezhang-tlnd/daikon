@@ -7,8 +7,11 @@ import org.talend.daikon.content.DeletableResource;
 
 public class LocalResourceResolver extends AbstractResourceResolver {
 
-    public LocalResourceResolver(ResourcePatternResolver delegate) {
+    private String locationPrefix;
+
+    public LocalResourceResolver(ResourcePatternResolver delegate, String locationPrefix) {
         super(delegate);
+        this.locationPrefix = locationPrefix;
     }
 
     @Override
@@ -16,4 +19,8 @@ public class LocalResourceResolver extends AbstractResourceResolver {
         return new LocalDeletableResource(this, writableResource);
     }
 
+    @Override
+    public String getLocationPrefix() {
+        return this.locationPrefix;
+    }
 }

@@ -20,6 +20,13 @@ public interface ResourceResolver extends ResourcePatternResolver {
     DeletableResource getResource(String location);
 
     /**
+     * Returning the location prefix of the resource
+     *
+     * @return the location prefix of the resource
+     */
+    String getLocationPrefix();
+
+    /**
      * Clear all resource according to a location
      * 
      * @param location the location
