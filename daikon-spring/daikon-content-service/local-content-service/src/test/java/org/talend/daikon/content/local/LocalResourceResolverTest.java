@@ -42,7 +42,7 @@ public class LocalResourceResolverTest {
   }
 
   @After
-  void cleanupRepository() {
+  public void cleanupRepository() {
     FileUtils.deleteQuietly(resolverRepositoryPath.toFile());
   }
 
